@@ -1,11 +1,4 @@
-מצוין! 😊
-עכשיו צריך להדביק את תוכן הקובץ בתיבה הגדולה.
-
-
-לחץ על התיבה הגדולה הריקה (שכתוב בה Enter file contents here)
-העתק והדבק את הטקסט הבא:
-
-pythonimport sqlite3
+import sqlite3
 import datetime
 import os
 import smtplib
@@ -18,14 +11,14 @@ from collections import defaultdict
 DB_PATH = "news.db"
 
 CATEGORY_EMOJI = {
-    "מאקרו": "🌍",
-    "שוק ההון": "📈",
-    'נדל"ן': "🏠",
-    "טכנולוגיה": "💻",
-    "בנקאות": "🏦",
-    "אנרגיה": "⚡",
-    "סחר חוץ": "🚢",
-    "כללי": "📰",
+    "מאקרו": "מאקרו",
+    "שוק ההון": "שוק ההון",
+    "נדלן": "נדלן",
+    "טכנולוגיה": "טכנולוגיה",
+    "בנקאות": "בנקאות",
+    "אנרגיה": "אנרגיה",
+    "סחר חוץ": "סחר חוץ",
+    "כללי": "כללי",
 }
 
 
@@ -48,8 +41,7 @@ def gemini_executive_summary(headlines):
         f"gemini-1.5-flash:generateContent?key={api_key}"
     )
     prompt = f"""אתה כלכלן בכיר. בהינתן הכותרות הכלכליות הבאות מהשבוע האחרון בישראל,
-כתוב תקציר מנהלים בעברית — 3 פסקאות קצרות — המסכם את המגמות המרכזיות
-ומה משמעותן לעסקים ולמשקיעים.
+כתוב תקציר מנהלים בעברית של 3 פסקאות קצרות המסכם את המגמות המרכזיות.
 
 כותרות:
 {chr(10).join(headlines[:25])}"""
@@ -59,7 +51,7 @@ def gemini_executive_summary(headlines):
         resp.raise_for_status()
         return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
     except Exception as e:
-        print(f"שגיאת Gemini בתקציר: {e}")
+        print(f"שגיאת Gemini: {e}")
         return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
 
 
@@ -71,14 +63,13 @@ def build_html(news_rows, exec_summary, week_start, week_end):
     total = sum(len(v) for v in by_cat.values())
     rows_html = ""
     for cat, items in sorted(by_cat.items()):
-        emoji = CATEGORY_EMOJI.get(cat, "📰")
         rows_html += f"""
         <tr>
           <td colspan="3" style="background:#1e3a5f;color:#fff;padding:10px 16px;
-              font-size:15px;font-weight:bold;">{emoji} {cat} ({len(items)} פריטים)</td>
+              font-size:15px;font-weight:bold;">{cat} ({len(items)} פריטים)</td>
         </tr>"""
         for i in items:
-            link = f'<a href="{i["url"]}" style="color:#1e3a5f;font-size:11px;">קישור ↗</a>' if i["url"] else ""
+            link = f'<a href="{i["url"]}" style="color:#1e3a5f;font-size:11px;">קישור</a>' if i["url"] else ""
             rows_html += f"""
         <tr style="border-bottom:1px solid #eee;">
           <td style="padding:10px 16px;font-size:12px;color:#555;width:90px;">
@@ -98,14 +89,14 @@ def build_html(news_rows, exec_summary, week_start, week_end):
   style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
   <tr>
     <td style="background:#1e3a5f;padding:32px 24px;text-align:center;">
-      <div style="color:#fff;font-size:24px;font-weight:bold;">📊 דוח כלכלי שבועי</div>
-      <div style="color:#a8c8f0;font-size:14px;margin-top:6px;">{week_start} – {week_end}</div>
-      <div style="color:#cce0f5;font-size:13px;margin-top:4px;">{total} פריטים מ-{len(by_cat)} קטגוריות</div>
+      <div style="color:#fff;font-size:24px;font-weight:bold;">דוח כלכלי שבועי</div>
+      <div style="color:#a8c8f0;font-size:14px;margin-top:6px;">{week_start} - {week_end}</div>
+      <div style="color:#cce0f5;font-size:13px;margin-top:4px;">{total} פריטים</div>
     </td>
   </tr>
   <tr><td style="padding:24px;">
     <div style="background:#eef4fb;border-right:4px solid #2e6da4;border-radius:6px;padding:16px 20px;">
-      <div style="color:#1e3a5f;font-size:14px;font-weight:bold;margin-bottom:10px;">📋 תקציר מנהלים</div>
+      <div style="color:#1e3a5f;font-size:14px;font-weight:bold;margin-bottom:10px;">תקציר מנהלים</div>
       <div style="color:#333;font-size:13px;line-height:1.8;">
           {exec_summary.replace(chr(10), "<br>")}</div>
     </div>
@@ -122,7 +113,7 @@ def build_html(news_rows, exec_summary, week_start, week_end):
     </table>
   </td></tr>
   <tr><td style="background:#f8f9fa;padding:16px 24px;text-align:center;border-top:1px solid #eee;">
-    <div style="color:#999;font-size:11px;">דוח זה נוצר אוטומטית בעזרת Google Gemini AI | נשלח כל שישי ב-09:00</div>
+    <div style="color:#999;font-size:11px;">דוח זה נוצר אוטומטית | נשלח כל שישי ב-09:00</div>
   </td></tr>
 </table></td></tr></table>
 </body></html>"""
@@ -142,24 +133,23 @@ def send_email(html_body, subject):
         s.starttls()
         s.login(sender, password)
         s.sendmail(sender, recipient, msg.as_string())
-    print(f"✅ הדוח נשלח ל-{recipient}")
+    print(f"הדוח נשלח")
 
 
 def generate_weekly_report():
-    print(f"\n📊 יצירת דוח שבועי — {datetime.date.today()}")
+    print(f"יצירת דוח שבועי - {datetime.date.today()}")
     today = datetime.date.today()
     week_start = str(today - datetime.timedelta(days=6))
     week_end = str(today)
     rows = get_week_news()
     if not rows:
-        print("⚠️  אין חדשות במסד לשבוע זה.")
+        print("אין חדשות במסד לשבוע זה.")
         return
-    print(f"  נמצאו {len(rows)} פריטים — מייצר תקציר...")
+    print(f"נמצאו {len(rows)} פריטים")
     headlines = [r[2] for r in rows]
     exec_summary = gemini_executive_summary(headlines)
     html, total = build_html(rows, exec_summary, week_start, week_end)
-    subject = f"📊 דוח כלכלי שבועי | {week_start}–{week_end} | {total} פריטים"
-    print("  שולח מייל...")
+    subject = f"דוח כלכלי שבועי | {week_start}-{week_end} | {total} פריטים"
     send_email(html, subject)
 
 
