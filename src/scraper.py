@@ -9,11 +9,13 @@ import time
 DB_PATH = "news.db"
 
 RSS_FEEDS = {
-    "דה מרקר": "https://www.themarker.com/srv/rss/themarker.xml",
     "גלובס": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=585",
-    "כלכליסט": "https://www.calcalist.co.il/Rss.aspx",
+    "גלובס שוק ההון": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1111",
+    "גלובס נדלן": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1170",
+    "ינט כלכלה": "https://www.ynet.co.il/Integration/StoryRss3370.xml",
+    "וואלה כלכלה": "https://rss.walla.co.il/feed/2",
+    "ביזפורטל": "https://www.bizportal.co.il/rss/rss.xml",
 }
-
 HEADERS = {"User-Agent": "Mozilla/5.0 Chrome/120.0"}
 
 
