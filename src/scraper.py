@@ -95,7 +95,7 @@ def collect_news():
         seen.add(title)
         print(f"  ✍️  מסכם: {title[:55]}...")
         summary, category = gemini_summarize(title)
-        time.sleep(1)
+        time.sleep(3)
         try:
             conn.execute(
                 "INSERT OR IGNORE INTO news (date,source,title,summary,category,url) VALUES (?,?,?,?,?,?)",
