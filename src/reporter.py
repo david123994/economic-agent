@@ -44,7 +44,7 @@ def gemini_executive_summary(headlines):
 כתוב תקציר מנהלים בעברית של 3 פסקאות קצרות המסכם את המגמות המרכזיות.
 
 כותרות:
-{chr(10).join(headlines[:10])}"""
+{chr(10).join(headlines[:8])}"""
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
         resp = requests.post(url, json=body, timeout=30)
