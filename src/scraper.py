@@ -10,8 +10,9 @@ RSS_FEEDS = {
     "גלובס": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=585",
     "גלובס שוק ההון": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1111",
     "גלובס נדלן": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1170",
-    "ביזפורטל": "https://www.bizportal.co.il/rss/rss.xml",
-    "ינט כלכלה": "https://www.ynet.co.il/Integration/StoryRss3370.xml",
+    "Google כלכלה ישראל": "https://news.google.com/rss/search?q=כלכלה+ישראל&hl=iw&gl=IL&ceid=IL:iw",
+    "Google שוק ההון": "https://news.google.com/rss/search?q=בורסה+תל+אביב&hl=iw&gl=IL&ceid=IL:iw",
+    "Google נדלן": "https://news.google.com/rss/search?q=נדלן+ישראל&hl=iw&gl=IL&ceid=IL:iw",
 }
 
 HEADERS = {"User-Agent": "Mozilla/5.0 Chrome/120.0"}
