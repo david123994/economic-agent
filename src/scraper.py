@@ -52,7 +52,7 @@ def fetch_rss(source_name, rss_url):
     return items
 
 
-def gemini_summarize(title):
+def ("", "כללי"):
     api_key = os.environ["GEMINI_API_KEY"]
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
@@ -94,7 +94,7 @@ def collect_news():
             continue
         seen.add(title)
         print(f"  ✍️  מסכם: {title[:55]}...")
-        summary, category = gemini_summarize(title)
+        summary, category = ("", "כללי")
         time.sleep(3)
         try:
             conn.execute(
