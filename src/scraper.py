@@ -55,12 +55,19 @@ def collect_news():
     print(f"איסוף חדשות - {datetime.date.today()}")
     conn = init_db()
     today = str(datetime.date.today())
+
+    # ניקוי כתבות וואלה ישנות
+    conn.execute("DELETE FROM news WHERE source LIKE '%וואלה%'")
+    conn.commit()
+    print("נוקו כתבות וואלה ישנות")
+
     saved = 0
     all_items = []
     for name, url in RSS_FEEDS.items():
         items = fetch_rss(name, url)
         print(f"  {name}: {len(items)} פריטים")
         all_items.extend(items)
+
     seen = set()
     for item in all_items:
         title = item["title"]
@@ -76,10 +83,10 @@ def collect_news():
             saved += 1
         except Exception as e:
             print(f"שגיאת DB: {e}")
+
     print(f"נשמרו {saved} כתבות.")
     conn.close()
 
 
 if __name__ == "__main__":
     collect_news()
-
