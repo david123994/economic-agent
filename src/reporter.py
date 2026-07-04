@@ -10,17 +10,19 @@ from collections import defaultdict
 
 DB_PATH = "news.db"
 
-CATEGORY_EMOJI = {
-    "מאקרו": "מאקרו",
-    "שוק ההון": "שוק ההון",
-    "נדלן": "נדלן",
-    "טכנולוגיה": "טכנולוגיה",
-    "בנקאות": "בנקאות",
-    "אנרגיה": "אנרגיה",
-    "סחר חוץ": "סחר חוץ",
-    "כללי": "כללי",
-}
+ECONOMIC_KEYWORDS = [
+    "שוק", "מניה", "בורסה", "כלכל", "תקציב", "ריבית", "אינפלציה",
+    "בנק", "השקעה", "נדלן", "נדל", "יצוא", "יבוא", "תוצר", "צמיחה",
+    "אבטלה", "משכורת", "שכר", "מיסוי", "מס", "תשואה", "קרן",
+    "ביטוח", "פנסיה", "אשראי", "הלוואה", "משכנתא", "דירה", "מחיר",
+    "יוקר", "עלות", "רווח", "הפסד", "חברה", "סטארטאפ", "היי טק",
+    "טכנולוגיה", "ייצוא", "סחר", "דולר", "שקל", "אירו", "מטבע",
+    "תשלום", "עסק", "תעשיה", "אנרגיה", "גז", "נפט", "חשמל"
+]
 
+def is_economic(title):
+    title_lower = title.lower()
+    return any(kw in title for kw in ECONOMIC_KEYWORDS)
 
 def get_week_news():
     conn = sqlite3.connect(DB_PATH)
@@ -31,8 +33,10 @@ def get_week_news():
         (str(week_ago),)
     ).fetchall()
     conn.close()
-    return rows
-
+    # סינון כתבות כלכליות בלבד
+    filtered = [r for r in rows if is_economic(r[2])]
+    print(f"  סוננו {len(filtered)} כתבות כלכליות מתוך {len(rows)}")
+    return filtered
 
 def gemini_executive_summary(headlines):
     api_key = os.environ["GEMINI_API_KEY"]
@@ -40,11 +44,13 @@ def gemini_executive_summary(headlines):
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.0-flash:generateContent?key={api_key}"
     )
-    prompt = f"""אתה כלכלן בכיר. בהינתן הכותרות הכלכליות הבאות מהשבוע האחרון בישראל,
-כתוב תקציר מנהלים בעברית של 3 פסקאות קצרות המסכם את המגמות המרכזיות.
+    # שולחים רק 5 כותרות לתקציר
+    top = headlines[:5]
+    prompt = f"""אתה כלכלן בכיר. בהינתן הכותרות הכלכליות הבאות מישראל,
+כתוב תקציר מנהלים קצר בעברית של 2 פסקאות בלבד.
 
 כותרות:
-{chr(10).join(headlines[:8])}"""
+{chr(10).join(top)}"""
     body = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
         resp = requests.post(url, json=body, timeout=30)
@@ -53,7 +59,6 @@ def gemini_executive_summary(headlines):
     except Exception as e:
         print(f"שגיאת Gemini: {e}")
         return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
-
 
 def build_html(news_rows, exec_summary, week_start, week_end):
     by_cat = defaultdict(list)
@@ -91,7 +96,7 @@ def build_html(news_rows, exec_summary, week_start, week_end):
     <td style="background:#1e3a5f;padding:32px 24px;text-align:center;">
       <div style="color:#fff;font-size:24px;font-weight:bold;">דוח כלכלי שבועי</div>
       <div style="color:#a8c8f0;font-size:14px;margin-top:6px;">{week_start} - {week_end}</div>
-      <div style="color:#cce0f5;font-size:13px;margin-top:4px;">{total} פריטים</div>
+      <div style="color:#cce0f5;font-size:13px;margin-top:4px;">{total} פריטים כלכליים</div>
     </td>
   </tr>
   <tr><td style="padding:24px;">
@@ -119,7 +124,6 @@ def build_html(news_rows, exec_summary, week_start, week_end):
 </body></html>"""
     return html, total
 
-
 def send_email(html_body, subject):
     sender = os.environ["EMAIL_SENDER"]
     password = os.environ["EMAIL_PASSWORD"]
@@ -135,7 +139,6 @@ def send_email(html_body, subject):
         s.sendmail(sender, recipient, msg.as_string())
     print(f"הדוח נשלח")
 
-
 def generate_weekly_report():
     print(f"יצירת דוח שבועי - {datetime.date.today()}")
     today = datetime.date.today()
@@ -143,15 +146,15 @@ def generate_weekly_report():
     week_end = str(today)
     rows = get_week_news()
     if not rows:
-        print("אין חדשות במסד לשבוע זה.")
+        print("אין חדשות כלכליות השבוע.")
         return
-    print(f"נמצאו {len(rows)} פריטים")
+    print(f"נמצאו {len(rows)} פריטים כלכליים")
     headlines = [r[2] for r in rows]
     exec_summary = gemini_executive_summary(headlines)
     html, total = build_html(rows, exec_summary, week_start, week_end)
     subject = f"דוח כלכלי שבועי | {week_start}-{week_end} | {total} פריטים"
     send_email(html, subject)
 
-
 if __name__ == "__main__":
     generate_weekly_report()
+
