@@ -52,7 +52,7 @@ def fetch_rss(source_name, rss_url):
     return items
 
 
-def ("", "כללי"):
+return ("", "כללי")
     api_key = os.environ["GEMINI_API_KEY"]
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
