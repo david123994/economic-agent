@@ -17,12 +17,22 @@ ECONOMIC_KEYWORDS = [
     "ביטוח", "פנסיה", "אשראי", "הלוואה", "משכנתא", "דירה", "מחיר",
     "יוקר", "עלות", "רווח", "הפסד", "חברה", "סטארטאפ", "היי טק",
     "טכנולוגיה", "ייצוא", "סחר", "דולר", "שקל", "אירו", "מטבע",
-    "תשלום", "עסק", "תעשיה", "אנרגיה", "גז", "נפט", "חשמל"
+    "תשלום", "עסק", "תעשיה", "אנרגיה", "גז", "נפט", "חשמל",
+    "קריפטו", "ביטקוין", "נאסדק", "וול סטריט", "תל אביב"
+]
+
+BLOCK_KEYWORDS = [
+    "מלחמה", "טיל", "רקטה", "חמאס", "חיזבאללה", "עזה", "לבנון",
+    "ביטחון", "צבא", "מבצע", "תקיפה", "פצצה", "נשק", "חייל",
+    "בחירות", "קואליציה", "אופוזיציה", "כנסת", "ממשלה", "שר ",
+    "ספורט", "כדורגל", "כדורסל", "אולימפיאדה", "גביע",
+    "סלבריטי", "שחקן", "זמר", "אמן", "סרט", "תוכנית"
 ]
 
 def is_economic(title):
-    title_lower = title.lower()
-    return any(kw in title for kw in ECONOMIC_KEYWORDS)
+    has_economic = any(kw in title for kw in ECONOMIC_KEYWORDS)
+    has_block = any(kw in title for kw in BLOCK_KEYWORDS)
+    return has_economic and not has_block
 
 def get_week_news():
     conn = sqlite3.connect(DB_PATH)
@@ -33,9 +43,8 @@ def get_week_news():
         (str(week_ago),)
     ).fetchall()
     conn.close()
-    # סינון כתבות כלכליות בלבד
     filtered = [r for r in rows if is_economic(r[2])]
-    print(f"  סוננו {len(filtered)} כתבות כלכליות מתוך {len(rows)}")
+    print(f"סוננו {len(filtered)} כתבות כלכליות מתוך {len(rows)}")
     return filtered
 
 def gemini_executive_summary(headlines):
@@ -44,7 +53,6 @@ def gemini_executive_summary(headlines):
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.0-flash:generateContent?key={api_key}"
     )
-    # שולחים רק 5 כותרות לתקציר
     top = headlines[:5]
     prompt = f"""אתה כלכלן בכיר. בהינתן הכותרות הכלכליות הבאות מישראל,
 כתוב תקציר מנהלים קצר בעברית של 2 פסקאות בלבד.
