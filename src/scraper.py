@@ -4,6 +4,7 @@ import sqlite3
 import datetime
 import os
 import time
+import json
 
 DB_PATH = "news.db"
 
@@ -11,13 +12,11 @@ RSS_FEEDS = {
     "גלובס": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=585",
     "גלובס שוק ההון": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1111",
     "גלובס נדלן": "https://www.globes.co.il/webservice/rss/rssfeeder.asmx/FeederNode?iID=1170",
-   "רויטרס עברית": "https://feeds.reuters.com/reuters/ilTopNews",
-"TheMarker": "https://www.themarker.com/srv/rss/themarker-all.xml",
+    "ביזפורטל": "https://www.bizportal.co.il/rss/rss.xml",
     "מאקו כלכלה": "https://rcs.mako.co.il/rss/31750a2610f26110VgnVCM1000005201000aRCRD.xml",
 }
 
 HEADERS = {"User-Agent": "Mozilla/5.0 Chrome/120.0"}
-
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
@@ -31,7 +30,6 @@ def init_db():
     """)
     conn.commit()
     return conn
-
 
 def fetch_rss(source_name, rss_url):
     items = []
@@ -51,7 +49,6 @@ def fetch_rss(source_name, rss_url):
         print(f"שגיאה ב-{source_name}: {e}")
     return items
 
-
 def collect_news():
     print(f"איסוף חדשות - {datetime.date.today()}")
     conn = init_db()
@@ -60,7 +57,6 @@ def collect_news():
     # ניקוי כתבות וואלה ישנות
     conn.execute("DELETE FROM news WHERE source LIKE '%וואלה%'")
     conn.commit()
-    print("נוקו כתבות וואלה ישנות")
 
     saved = 0
     all_items = []
@@ -87,7 +83,6 @@ def collect_news():
 
     print(f"נשמרו {saved} כתבות.")
     conn.close()
-
 
 if __name__ == "__main__":
     collect_news()
