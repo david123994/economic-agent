@@ -37,7 +37,7 @@ def is_economic(title):
 def get_week_news():
     conn = sqlite3.connect(DB_PATH)
     today = datetime.date.today()
-    week_ago = today - datetime.timedelta(days=7)
+   week_ago = today
     rows = conn.execute(
         "SELECT date,source,title,summary,category,url FROM news WHERE date >= ? ORDER BY date DESC, category",
         (str(week_ago),)
