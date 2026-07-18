@@ -61,13 +61,27 @@ def gemini_executive_summary(headlines):
 כותרות:
 {chr(10).join(top)}"""
     body = {"contents": [{"parts": [{"text": prompt}]}]}
-    try:
-        resp = requests.post(url, json=body, timeout=30)
-        resp.raise_for_status()
-        return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except Exception as e:
-        print(f"שגיאת Gemini: {e}")
-        return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
+
+    max_retries = 3
+    wait_seconds = 20
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.post(url, json=body, timeout=30)
+            resp.raise_for_status()
+            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except requests.exceptions.HTTPError as e:
+            if resp.status_code == 429 and attempt < max_retries:
+                print(f"שגיאת 429 (ניסיון {attempt}/{max_retries}) - ממתין {wait_seconds} שניות...")
+                time.sleep(wait_seconds)
+                continue
+            print(f"שגיאת Gemini: {e}")
+            return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
+        except Exception as e:
+            print(f"שגיאת Gemini: {e}")
+            return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
+
+    return "לא ניתן היה לייצר תקציר אוטומטי השבוע."
 
 def build_html(news_rows, exec_summary, week_start, week_end):
     by_cat = defaultdict(list)
