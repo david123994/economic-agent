@@ -52,8 +52,8 @@ def gemini_executive_summary(headlines):
     api_key = os.environ["GEMINI_API_KEY"]
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.0-flash:generateContent?key={api_key}"
-    )
+        f"gemini-2.5-flash:generateContent?key={api_key}"
+     )
     top = headlines[:5]
     prompt = f"""אתה כלכלן בכיר. בהינתן הכותרות הכלכליות הבאות מישראל,
 כתוב תקציר מנהלים קצר בעברית של 2 פסקאות בלבד.
