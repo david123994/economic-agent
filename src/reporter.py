@@ -117,7 +117,7 @@ def build_html(news_rows, exec_summary, week_start, week_end):
   style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
   <tr>
     <td style="background:#1e3a5f;padding:32px 24px;text-align:center;">
-      <div style="color:#fff;font-size:24px;font-weight:bold;">דוח כלכלי שבועי</div>
+      <div style="color:#fff;font-size:24px;font-weight:bold;">דוח כלכלי יומי</div>
       <div style="color:#a8c8f0;font-size:14px;margin-top:6px;">{week_start} - {week_end}</div>
       <div style="color:#cce0f5;font-size:13px;margin-top:4px;">{total} פריטים כלכליים</div>
     </td>
@@ -141,7 +141,7 @@ def build_html(news_rows, exec_summary, week_start, week_end):
     </table>
   </td></tr>
   <tr><td style="background:#f8f9fa;padding:16px 24px;text-align:center;border-top:1px solid #eee;">
-    <div style="color:#999;font-size:11px;">דוח זה נוצר אוטומטית | נשלח כל שישי ב-09:00</div>
+    <div style="color:#999;font-size:11px;">דוח זה נוצר אוטומטית | נשלח כל יום ב-09:00</div>
   </td></tr>
 </table></td></tr></table>
 </body></html>"""
@@ -165,7 +165,7 @@ def send_email(html_body, subject):
 def generate_weekly_report():
     print(f"יצירת דוח שבועי - {datetime.date.today()}")
     today = datetime.date.today()
-    week_start = str(today - datetime.timedelta(days=6))
+    week_start = str(today)
     week_end = str(today)
     rows = get_week_news()
     if not rows:
