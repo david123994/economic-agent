@@ -1,9 +1,11 @@
 name: Economic News Agent (Free)
 on:
   schedule:
-    - cron: "0 6 * * *"
-  workflow_dispatch:
-    inputs:
+    # 06:00 UTC מקביל ל-09:00 בבוקר בשעון קיץ בישראל (UTC+3)
+    # (בחורף ניתן לשנות ל- '0 7 * * *')
+    - cron: '0 6 * * *'
+  workflow_dispatch: # מאפשר הרצה ידנית בלחיצת כפתור במידת הצורך
+        inputs:
       action:
         description: "בחר פעולה"
         required: true
